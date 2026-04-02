@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UniPredict Ghana — Predict Your Future</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+<!-- Load assets (logo + founder photos) and database separately -->
+
+<!-- This keeps index.html small and viewable -->
+
+<script src="assets.js"></script>
+
+<script src="db.js"></script>
+
+<style>
+/* ══════════════════════════════════════════════
+   UniPredict Ghana — Design System
+   Dark navy theme: #060d1a base, #00d4c8 teal
+══════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:#060d1a;color:#f5f9ff;font-family:'DM Sans',sans-serif;font-size:16px;line-height:1.6;overflow-x:hidden}
+h1,h2,h3,h4,h5{font-family:'Syne',sans-serif;line-height:1.15}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:66px;background:#080f1e;border-bottom:1px solid rgba(255,255,255,0.08)}
+.nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;cursor:pointer}
+.nav-logo img{height:42px;width:auto;object-fit:contain}
+.nav-logo-text{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:#f5f9ff;letter-spacing:-0.5px}
+.nav-logo-text span{color:#00d4c8}
+.nav-links{display:flex;align-items:center;gap:4px;list-style:none}
+.nav-links a{color:#93a8cc;text-decoration:none;font-size:14px;font-weight:500;padding:8px 16px;border-radius:8px;cursor:pointer;transition:all .2s}
+.nav-links a:hover{color:#f5f9ff;background:rgba(255,255,255,0.06)}
+.nav-cta{background:rgba(0,212,200,0.15)!important;border:1px solid rgba(0,212,200,0.3)!important;color:#00d4c8!important;font-weight:700!important}
+.nav-cta:hover{background:#00d4c8!important;color:#000!important}
+
+/* ── TICKER ── */
+.ticker-wrap{background:#06111f;border-bottom:1px solid rgba(255,255,255,0.06);padding:8px 0;overflow:hidden;position:fixed;top:66px;left:0;right:0;z-index:999}
+.ticker-track{display:flex;gap:48px;width:max-content;animation:tickerScroll 35s linear infinite}
+.ticker-track:hover{animation-play-state:paused}
+.ticker-item{font-size:12px;color:#4e6285;white-space:nowrap;display:flex;align-items:center;gap:8px}
+.ticker-dot{width:5px;height:5px;border-radius:50%;background:#00d4c8;flex-shrink:0}
+@keyframes tickerScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ── HERO ── */
+#hero{min-height:100vh;padding-top:100px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;padding-left:80px;padding-right:80px;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;z-index:0}
+.hero-bg::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 60% 30%,rgba(0,212,200,0.1) 0%,transparent 70%),radial-gradient(ellipse 50% 50% at 20% 80%,rgba(77,159,255,0.07) 0%,transparent 60%)}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.03) 1px,transparent 1px);background-size:64px 64px}
+.hero-content{position:relative;z-index:1;max-width:640px}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,212,200,0.12);border:1px solid rgba(0,212,200,0.25);border-radius:100px;padding:6px 16px;font-size:12px;font-weight:700;color:#00d4c8;text-transform:uppercase;letter-spacing:1px;margin-bottom:28px}
+.hero-badge-dot{width:6px;height:6px;border-radius:50%;background:#00d4c8;animation:pulseDot 2s infinite}
+@keyframes pulseDot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+.hero-title{font-size:clamp(42px,5.5vw,72px);font-weight:800;letter-spacing:-2px;line-height:1.05;margin-bottom:24px}
+.hero-title .accent{color:#00d4c8}
+.hero-sub{font-size:18px;color:#93a8cc;font-weight:300;line-height:1.7;margin-bottom:40px;max-width:480px}
+.btn-cta{display:inline-flex;align-items:center;gap:10px;background:#00d4c8;color:#000;font-family:'Syne',sans-serif;font-weight:800;font-size:15px;letter-spacing:.5px;padding:16px 36px;border-radius:10px;border:none;cursor:pointer;transition:all .2s;text-transform:uppercase}
+.btn-cta:hover{background:#00b8ad;transform:translateY(-2px);box-shadow:0 16px 48px rgba(0,212,200,0.3)}
+.hero-stats{display:flex;gap:40px;margin-top:56px;padding-top:32px;border-top:1px solid rgba(255,255,255,0.08)}
+.hstat-num{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:#f5f9ff;letter-spacing:-1px}
+.hstat-num span{color:#00d4c8}
+.hstat-label{font-size:12px;color:#4e6285;margin-top:2px}
+
+/* Floating card */
+.hero-float-card{position:absolute;right:80px;top:50%;transform:translateY(-50%);background:rgba(13,28,50,0.92);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:28px;width:260px;animation:floatAnim 5s ease-in-out infinite;box-shadow:0 32px 80px rgba(0,0,0,0.4)}
+@keyframes floatAnim{0%,100%{transform:translateY(-50%) translateY(0)}50%{transform:translateY(-50%) translateY(-10px)}}
+.fc-ring-wrap{position:relative;width:90px;height:90px;margin:0 auto 18px}
+.fc-ring-wrap svg{transform:rotate(-90deg);width:90px;height:90px}
+.fc-ring-bg{fill:none;stroke:rgba(255,255,255,0.07);stroke-width:7}
+.fc-ring-fill{fill:none;stroke:#00d4c8;stroke-width:7;stroke-linecap:round;stroke-dasharray:220;stroke-dashoffset:38;filter:drop-shadow(0 0 6px #00d4c8);animation:ringAnim 2s 1s ease both}
+@keyframes ringAnim{from{stroke-dashoffset:220}to{stroke-dashoffset:38}}
+.fc-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.fc-pct{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:#00d4c8;line-height:1}
+.fc-lbl{font-size:9px;color:#4e6285;font-weight:600;text-transform:uppercase;letter-spacing:.5px}
+.fc-match{background:rgba(0,212,200,0.12);border:1px solid rgba(0,212,200,0.2);border-radius:10px;padding:12px;text-align:left}
+.fc-match-lbl{font-size:10px;font-weight:700;color:#00d4c8;text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px}
+.fc-match-prog{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#f5f9ff}
+.fc-match-uni{font-size:11px;color:#93a8cc;margin-top:2px}
+
+/* ── SHARED SECTIONS ── */
+section:not(#hero){padding:90px 80px;border-top:1px solid rgba(255,255,255,0.07)}
+.section-tag{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:#00d4c8;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.section-tag::before{content:'';width:24px;height:2px;background:#00d4c8;border-radius:2px}
+.section-title{font-family:'Syne',sans-serif;font-size:clamp(28px,4vw,46px);font-weight:800;letter-spacing:-1.5px;margin-bottom:16px;color:#f5f9ff}
+.section-sub{font-size:16px;color:#93a8cc;font-weight:300;max-width:540px;line-height:1.7;margin-bottom:48px}
+
+/* ── FEATURES ── */
+#features{background:#070d1c}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.feat-card{background:#0f1e33;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:28px;transition:all .3s;position:relative;overflow:hidden}
+.feat-card:hover{border-color:rgba(0,212,200,0.3);transform:translateY(-4px);box-shadow:0 20px 60px rgba(0,0,0,0.3)}
+.feat-icon{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:16px}
+.fi-teal{background:rgba(0,212,200,0.15);border:1px solid rgba(0,212,200,0.25)}
+.fi-blue{background:rgba(77,159,255,0.15);border:1px solid rgba(77,159,255,0.25)}
+.fi-green{background:rgba(0,232,122,0.15);border:1px solid rgba(0,232,122,0.25)}
+.fi-amber{background:rgba(245,166,35,0.15);border:1px solid rgba(245,166,35,0.25)}
+.feat-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:10px;color:#f5f9ff}
+.feat-desc{font-size:13px;color:#93a8cc;line-height:1.65}
+
+/* ── HOW IT WORKS ── */
+#how{background:#060d1a}
+.steps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;position:relative}
+.steps-grid::before{content:'';position:absolute;top:28px;left:calc(16.67% + 20px);right:calc(16.67% + 20px);height:2px;background:linear-gradient(90deg,#00d4c8,#4d9fff,#00e87a);z-index:0}
+.step{text-align:center;padding:0 24px;position:relative;z-index:1}
+.step-num{width:56px;height:56px;border-radius:50%;background:#060d1a;border:2px solid #00d4c8;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#00d4c8;margin:0 auto 20px}
+.step-heading{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:10px;color:#f5f9ff}
+.step-desc{font-size:13px;color:#93a8cc;line-height:1.65}
+
+/* ── CHECKER ── */
+#checker{background:#07101f;padding:90px 0}
+.checker-inner{display:grid;grid-template-columns:1fr 1fr;gap:0;max-width:1200px;margin:0 auto;padding:0 80px}
+.checker-form-wrap{background:#0c1a2e;border:1px solid rgba(255,255,255,0.09);border-radius:20px 0 0 20px;padding:36px;border-right:none}
+.results-panel{background:#0f2040;border:1px solid rgba(255,255,255,0.09);border-radius:0 20px 20px 0;padding:32px;border-left:1px solid rgba(0,212,200,0.1);min-height:500px;display:flex;flex-direction:column}
+
+/* Form elements */
+.form-section-title{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#f5f9ff;margin-bottom:24px;letter-spacing:-0.5px}
+.form-group{margin-bottom:18px}
+.form-label{font-size:12px;font-weight:600;color:#93a8cc;text-transform:uppercase;letter-spacing:.8px;margin-bottom:7px;display:block}
+.form-select,.form-input{width:100%;background:#122038;border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:11px 14px;color:#f5f9ff;font-family:'DM Sans',sans-serif;font-size:14px;appearance:none;cursor:pointer;transition:border-color .2s,background .2s}
+.form-select:focus,.form-input:focus{outline:none;border-color:#00d4c8;background:rgba(0,212,200,0.06);box-shadow:0 0 0 3px rgba(0,212,200,0.1)}
+.form-select option,.form-select optgroup{background:#0f1e33;color:#f5f9ff}
+.select-wrap{position:relative}
+.select-wrap::after{content:'▾';position:absolute;right:14px;top:50%;transform:translateY(-50%);color:#4e6285;pointer-events:none;font-size:12px}
+
+/* Steps */
+.form-steps{display:flex;gap:8px;margin-bottom:28px}
+.fsi-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.1);transition:all .3s;cursor:pointer}
+.fsi-dot.active{background:#00d4c8;box-shadow:0 0 8px rgba(0,212,200,0.4)}
+.fsi-dot.done{background:rgba(0,212,200,0.3)}
+.step-label{font-size:11px;color:#00d4c8;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.checker-step{display:none}
+.checker-step.active{display:block;animation:fadeUp .3s ease}
+
+/* Grades grid */
+.grades-2col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grades-3col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+
+/* Radio buttons */
+.radio-group{display:flex;gap:8px;flex-wrap:wrap}
+.radio-btn{padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;border:1px solid rgba(255,255,255,0.12);background:transparent;color:#93a8cc;cursor:pointer;transition:all .2s}
+.radio-btn.selected,.radio-btn:hover{background:rgba(0,212,200,0.12);border-color:rgba(0,212,200,0.3);color:#00d4c8}
+
+/* Nav buttons */
+.form-nav{display:flex;gap:10px;margin-top:24px}
+.btn-next{flex:1;padding:13px;background:#00d4c8;color:#000;font-family:'Syne',sans-serif;font-weight:800;font-size:14px;border:none;border-radius:10px;cursor:pointer;transition:all .2s}
+.btn-next:hover{background:#00b8ad;transform:translateY(-1px);box-shadow:0 8px 30px rgba(0,212,200,0.25)}
+.btn-back-sm{padding:13px 20px;background:#172843;border:1px solid rgba(255,255,255,0.1);color:#93a8cc;font-family:'Syne',sans-serif;font-weight:700;font-size:13px;border-radius:10px;cursor:pointer;transition:all .2s}
+.btn-back-sm:hover{color:#f5f9ff;background:#1f3558}
+
+/* Results panel */
+.results-placeholder,.loading-indicator{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;padding:32px}
+.rp-icon{font-size:48px;margin-bottom:14px;opacity:.3}
+.rp-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:#93a8cc;margin-bottom:8px}
+.rp-sub{font-size:13px;color:#4e6285;max-width:280px;line-height:1.6}
+.spinner{width:40px;height:40px;border:3px solid rgba(0,212,200,0.15);border-top-color:#00d4c8;border-radius:50%;animation:spin .8s linear infinite;margin-bottom:14px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.results-content{display:none}
+.result-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,0.08)}
+.rt-uni{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#f5f9ff;margin-bottom:2px}
+.rt-sub{font-size:12px;color:#4e6285}
+.result-agg-box{background:rgba(0,212,200,0.12);border:1px solid rgba(0,212,200,0.2);border-radius:10px;padding:10px 18px;text-align:center;flex-shrink:0}
+.agg-num{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:#00d4c8;line-height:1}
+.agg-label{font-size:10px;color:#4e6285;margin-top:2px;text-transform:uppercase;letter-spacing:.5px}
+
+/* Action buttons */
+.result-actions{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.act-btn{display:flex;align-items:center;gap:7px;background:#122038;border-radius:8px;padding:9px 16px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;border:none;text-decoration:none}
+.act-btn-teal{border:1px solid rgba(0,212,200,0.3);color:#00d4c8}
+.act-btn-teal:hover{background:rgba(0,212,200,0.12)}
+.act-btn-amber{border:1px solid rgba(245,166,35,0.3);color:#f5a623}
+.act-btn-amber:hover{background:rgba(245,166,35,0.08)}
+.premium-chip{background:rgba(245,166,35,0.15);color:#f5a623;font-size:10px;padding:2px 7px;border-radius:10px}
+
+/* Program list */
+.program-list{list-style:none}
+.program-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.06)}
+.program-item:last-child{border:none}
+.pi-name{font-size:13px;font-weight:600;color:#f5f9ff;margin-bottom:2px}
+.pi-cut{font-size:11px;color:#4e6285}
+.pi-note{font-size:11px;color:#4d9fff;margin-top:2px}
+.pi-badge{font-size:11px;font-weight:700;padding:3px 12px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+.pi-badge.qualify{background:rgba(0,232,122,0.12);color:#00e87a;border:1px solid rgba(0,232,122,0.25)}
+.pi-badge.borderline{background:rgba(0,212,200,0.12);color:#00d4c8;border:1px solid rgba(0,212,200,0.25)}
+
+/* AI advice */
+.ai-advice{background:linear-gradient(135deg,rgba(77,159,255,0.08),rgba(0,232,122,0.05));border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px;margin-top:16px}
+.ai-advice-header{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:#4d9fff;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
+.ai-advice-text{font-size:13px;color:#93a8cc;line-height:1.65}
+
+/* ── UNIVERSITIES ── */
+#universities{background:#070d1c}
+.uni-scroll{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:40px}
+.uni-chip{background:#0f1e33;border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .2s}
+.uni-chip:hover{border-color:rgba(0,212,200,0.3);background:rgba(0,212,200,0.08);transform:translateY(-2px)}
+.uni-chip-abbr{font-family:'Syne',sans-serif;font-size:12px;font-weight:800;color:#f5f9ff;display:block}
+.uni-chip-name{font-size:10px;color:#4e6285;margin-top:3px;display:block;line-height:1.3}
+
+/* ── TEAM ── */
+#team{background:#060d1a}
+.team-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;max-width:800px;margin:0 auto}
+.team-card{background:#0f1e33;border:1px solid rgba(255,255,255,0.08);border-radius:20px;overflow:hidden;transition:all .3s;position:relative}
+.team-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#00d4c8,#1a6fbf);z-index:2}
+.team-card:hover{transform:translateY(-6px);border-color:rgba(0,212,200,0.25);box-shadow:0 24px 60px rgba(0,0,0,0.4)}
+.team-photo-wrap{position:relative;aspect-ratio:1/1;overflow:hidden}
+.team-photo{width:100%;height:100%;object-fit:cover;object-position:center top;transition:transform .4s}
+.team-card:hover .team-photo{transform:scale(1.04)}
+.team-photo-overlay{position:absolute;bottom:0;left:0;right:0;height:50%;background:linear-gradient(to top,#0f1e33,transparent)}
+.founder-badge{position:absolute;top:14px;right:14px;background:rgba(0,212,200,0.9);color:#000;font-family:'Syne',sans-serif;font-size:10px;font-weight:800;padding:4px 10px;border-radius:6px;text-transform:uppercase;letter-spacing:.5px;z-index:3}
+.team-info{padding:20px 24px 24px}
+.team-role-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(0,212,200,0.12);border:1px solid rgba(0,212,200,0.25);border-radius:100px;padding:4px 12px;font-size:10px;font-weight:700;color:#00d4c8;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px}
+.team-name{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;letter-spacing:-.5px;margin-bottom:4px;color:#f5f9ff}
+.team-title{font-size:12px;color:#00d4c8;font-weight:600;margin-bottom:12px}
+.team-bio{font-size:13px;color:#93a8cc;line-height:1.65;margin-bottom:16px}
+.team-socials{display:flex;gap:10px}
+.team-social-btn{display:inline-flex;align-items:center;gap:6px;background:#122038;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;color:#93a8cc;text-decoration:none;transition:all .2s;cursor:pointer}
+.team-social-btn:hover{color:#00d4c8;border-color:rgba(0,212,200,0.3);background:rgba(0,212,200,0.08)}
+
+/* ── TESTIMONIALS ── */
+#testimonials{background:#070d1c;overflow:hidden;padding-left:0;padding-right:0}
+.testi-header{padding:0 80px;margin-bottom:40px}
+.testi-track{display:flex;gap:20px;width:max-content;animation:testiScroll 30s linear infinite}
+.testi-track:hover{animation-play-state:paused}
+@keyframes testiScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.testi-card{background:#0f1e33;border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:24px;width:300px;flex-shrink:0}
+.testi-card:hover{border-color:rgba(0,212,200,0.2)}
+.testi-top{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.testi-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:14px;flex-shrink:0}
+.testi-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#f5f9ff}
+.testi-school{font-size:11px;color:#4e6285;margin-top:1px}
+.testi-quote{font-size:13px;color:#93a8cc;line-height:1.65;font-style:italic;margin-bottom:14px}
+.testi-footer{display:flex;justify-content:space-between;align-items:center}
+.testi-program{font-size:11px;color:#00e87a;font-weight:600}
+.testi-agg{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:#00d4c8}
+
+/* ── PRICING ── */
+#pricing{background:#060d1a}
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:48px}
+.pricing-card{background:#0f1e33;border:1px solid rgba(255,255,255,0.09);border-radius:20px;padding:32px;transition:all .3s;position:relative}
+.pricing-card:hover{transform:translateY(-4px);box-shadow:0 20px 60px rgba(0,0,0,0.3)}
+.pricing-card.featured{border-color:#00d4c8;background:linear-gradient(135deg,#0f1e33,rgba(0,212,200,0.05))}
+.pricing-card.featured::before{content:'MOST POPULAR';position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#00d4c8;color:#000;font-size:10px;font-weight:800;letter-spacing:1px;padding:4px 14px;border-radius:100px;font-family:'Syne',sans-serif;white-space:nowrap}
+.plan-name{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#93a8cc;margin-bottom:12px}
+.plan-price{display:flex;align-items:baseline;gap:4px;margin-bottom:4px}
+.plan-currency{font-size:16px;font-weight:600;color:#93a8cc}
+.plan-amount{font-family:'Syne',sans-serif;font-size:44px;font-weight:800;color:#f5f9ff;letter-spacing:-2px}
+.plan-period{font-size:13px;color:#4e6285;margin-bottom:24px}
+.plan-features{list-style:none;margin-bottom:28px}
+.plan-features li{display:flex;align-items:center;gap:10px;font-size:13px;color:#93a8cc;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.06)}
+.plan-features li:last-child{border:none}
+.plan-features li::before{content:'✓';color:#00e87a;font-weight:700;flex-shrink:0}
+.plan-features li.disabled{color:#4e6285}
+.plan-features li.disabled::before{content:'×';color:#4e6285}
+.btn-plan{width:100%;padding:13px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:800;font-size:13px;cursor:pointer;transition:all .2s;border:none}
+.btn-plan-featured{background:#00d4c8;color:#000}
+.btn-plan-featured:hover{background:#00b8ad;transform:translateY(-1px)}
+.btn-plan-outline{background:transparent;color:#93a8cc;border:1px solid rgba(255,255,255,0.12)!important}
+.btn-plan-outline:hover{color:#f5f9ff;background:#172843}
+
+/* ── FOOTER ── */
+footer{background:#040a14;border-top:1px solid rgba(255,255,255,0.07);padding:60px 80px 28px}
+.footer-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;padding-bottom:40px;border-bottom:1px solid rgba(255,255,255,0.07);margin-bottom:24px}
+.footer-brand p{font-size:13px;color:#4e6285;line-height:1.7;margin-top:14px;max-width:260px}
+.footer-col-title{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#93a8cc;margin-bottom:14px}
+.footer-links{list-style:none}
+.footer-links li{margin-bottom:8px}
+.footer-links a{color:#4e6285;text-decoration:none;font-size:13px;transition:color .2s;cursor:pointer}
+.footer-links a:hover{color:#00d4c8}
+.footer-bottom{display:flex;justify-content:space-between;font-size:12px;color:#4e6285;flex-wrap:wrap;gap:8px}
+
+/* ── SPLASH SCREEN ── */
+#splash{position:fixed;inset:0;z-index:99999;background:#060d1a;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;transition:opacity .6s ease,transform .6s ease}
+#splash.hiding{opacity:0;transform:scale(1.04);pointer-events:none}
+.splash-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 60% 30%,rgba(0,212,200,0.1) 0%,transparent 70%),radial-gradient(ellipse 50% 50% at 20% 80%,rgba(77,159,255,0.07) 0%,transparent 60%);pointer-events:none}
+.splash-logo-wrap{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;animation:splashIn .9s cubic-bezier(.16,1,.3,1) both}
+.splash-logo{width:160px;height:auto;object-fit:contain}
+.splash-tagline{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#00d4c8;margin-top:8px}
+.splash-divider{position:relative;z-index:2;width:1px;height:56px;background:linear-gradient(to bottom,#00d4c8,transparent);margin:24px 0;animation:splashIn .9s .2s cubic-bezier(.16,1,.3,1) both}
+.splash-headline{position:relative;z-index:2;text-align:center;animation:splashIn .9s .3s cubic-bezier(.16,1,.3,1) both}
+.splash-headline h1{font-family:'Syne',sans-serif;font-size:clamp(26px,5vw,50px);font-weight:800;letter-spacing:-1.5px;color:#f5f9ff;line-height:1.1;margin-bottom:12px}
+.splash-headline h1 span{color:#00d4c8}
+.splash-headline p{font-size:15px;color:#93a8cc;font-weight:300;max-width:360px;margin:0 auto 28px;line-height:1.6}
+.splash-enter-btn{display:inline-flex;align-items:center;gap:10px;background:#00d4c8;color:#000;font-family:'Syne',sans-serif;font-weight:800;font-size:14px;letter-spacing:1px;text-transform:uppercase;padding:16px 40px;border-radius:10px;border:none;cursor:pointer;transition:all .2s}
+.splash-enter-btn:hover{background:#00b8ad;transform:translateY(-2px);box-shadow:0 12px 40px rgba(0,212,200,0.3)}
+.splash-stats{position:relative;z-index:2;display:flex;gap:36px;margin-top:36px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.08);animation:splashIn .9s .5s cubic-bezier(.16,1,.3,1) both}
+.splash-stat-num{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#f5f9ff;text-align:center}
+.splash-stat-num span{color:#00d4c8}
+.splash-stat-label{font-size:10px;color:#4e6285;margin-top:2px;text-align:center}
+.splash-star{position:absolute;bottom:24px;right:24px;font-size:22px;opacity:.2;z-index:2}
+@keyframes splashIn{from{opacity:0;transform:translateY(24px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+/* ── PDF + COMPARE MODALS ── */
+@media print{
+  body *{visibility:hidden!important}
+  #pdf-report,#pdf-report *{visibility:visible!important}
+  #pdf-report{position:fixed!important;left:0!important;top:0!important;width:100%!important;background:white!important;color:#111!important;font-family:Arial,sans-serif!important;padding:32px!important;z-index:999999!important}
+  .pdf-hdr{border-bottom:3px solid #00b8ad;padding-bottom:16px;margin-bottom:20px}
+  .pdf-uni{font-size:22px;font-weight:bold;color:#0a1628}
+  .pdf-meta{font-size:13px;color:#555;margin-top:4px}
+  .pdf-agg-box{display:inline-block;background:#e8faf9;border:2px solid #00b8ad;border-radius:10px;padding:10px 24px;text-align:center;margin:12px 0}
+  .pdf-agg-num{font-size:32px;font-weight:bold;color:#00867a}
+  .pdf-agg-lbl{font-size:11px;color:#666}
+  .pdf-sec-title{font-size:13px;font-weight:bold;color:#0a1628;margin:16px 0 8px;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #ddd;padding-bottom:4px}
+  .pdf-row{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-bottom:1px solid #f0f0f0;font-size:12px}
+  .pdf-row:nth-child(even){background:#f9f9f9}
+  .pdf-badge{padding:2px 10px;border-radius:20px;font-size:11px;font-weight:bold}
+  .pdf-badge.q{background:#d4f5e4;color:#0a7f3a}
+  .pdf-badge.b{background:#fff4cc;color:#7a5c00}
+  .pdf-badge.f{background:#ffd6dc;color:#8a0020}
+  .pdf-ftr{margin-top:24px;font-size:11px;color:#888;text-align:center;border-top:1px solid #ddd;padding-top:12px}
+  .pdf-watermark{opacity:.06;font-size:72px;font-weight:bold;color:#00b8ad;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-35deg);pointer-events:none;white-space:nowrap}
+}
+
+.overlay-modal{display:none;position:fixed;inset:0;z-index:50000;background:rgba(4,9,20,.97);align-items:center;justify-content:center;padding:20px}
+.overlay-modal.open{display:flex}
+.modal-box{background:#0c1a2e;border:1px solid rgba(0,212,200,0.25);border-radius:20px;padding:36px;max-width:480px;width:100%;text-align:center;animation:fadeUp .35s ease;position:relative}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px) scale(.98)}to{opacity:1;transform:none}}
+.modal-icon{font-size:48px;margin-bottom:14px;display:block}
+.modal-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#f5f9ff;margin-bottom:8px}
+.modal-sub{font-size:13px;color:#93a8cc;margin-bottom:24px;line-height:1.6}
+.modal-btn{display:block;width:100%;padding:14px;border-radius:10px;font-family:'Syne',sans-serif;font-weight:800;font-size:14px;cursor:pointer;border:none;transition:all .2s;margin-bottom:10px}
+.modal-btn.primary{background:#00d4c8;color:#000}
+.modal-btn.primary:hover{background:#00b8ad;transform:translateY(-1px)}
+.modal-btn.secondary{background:transparent;color:#93a8cc;border:1px solid rgba(255,255,255,0.1)!important}
+.modal-btn.secondary:hover{color:#f5f9ff}
+.modal-close{position:absolute;top:14px;right:16px;background:none;border:none;color:#4e6285;font-size:20px;cursor:pointer;transition:color .2s;padding:4px}
+.modal-close:hover{color:#f5f9ff}
+.lock-box{background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.25);border-radius:12px;padding:16px;margin-bottom:20px}
+.lock-text{font-size:13px;color:#f5a623;font-weight:600;line-height:1.5}
+.lock-text a{color:#00d4c8;text-decoration:none}
+
+/* Compare modal */
+.compare-overlay{display:none;position:fixed;inset:0;z-index:50000;background:rgba(4,9,20,.97);align-items:flex-start;justify-content:center;overflow-y:auto;padding:80px 20px 40px}
+.compare-overlay.open{display:flex}
+.compare-box{background:#08111f;border:1px solid rgba(0,212,200,0.15);border-radius:20px;width:100%;max-width:960px;overflow:hidden;animation:fadeUp .35s ease}
+.compare-header{background:#0c1a2e;border-bottom:1px solid rgba(255,255,255,0.08);padding:24px 28px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.compare-title-text{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#f5f9ff}
+.compare-prem-badge{background:rgba(245,166,35,.12);border:1px solid rgba(245,166,35,.3);color:#f5a623;font-size:10px;font-weight:700;padding:3px 12px;border-radius:20px;text-transform:uppercase;letter-spacing:.5px}
+.compare-close-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);color:#93a8cc;border-radius:8px;padding:8px 14px;cursor:pointer;font-size:13px;transition:all .2s}
+.compare-close-btn:hover{color:#f5f9ff;background:rgba(255,255,255,.14)}
+.compare-sels{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:24px 28px;border-bottom:1px solid rgba(255,255,255,.07);background:#060d1a}
+.compare-sel-lbl{font-size:11px;font-weight:700;color:#00d4c8;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.compare-sel{width:100%;background:#0f1e33;border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:11px 14px;color:#f5f9ff;font-family:'DM Sans',sans-serif;font-size:13px;appearance:none;cursor:pointer}
+.compare-sel:focus{outline:none;border-color:#00d4c8}
+.compare-sel option,.compare-sel optgroup{background:#0f1e33}
+.compare-run-btn{display:block;margin:20px 28px;width:calc(100% - 56px);padding:14px;background:#00d4c8;color:#000;font-family:'Syne',sans-serif;font-weight:800;font-size:14px;border:none;border-radius:10px;cursor:pointer;transition:all .2s}
+.compare-run-btn:hover{background:#00b8ad;transform:translateY(-1px);box-shadow:0 8px 30px rgba(0,212,200,.25)}
+#compare-results{padding:0 28px 28px}
+.compare-summary{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.cmp-card{background:#0f1e33;border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:16px 20px}
+.cmp-card-uni{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:#f5f9ff;margin-bottom:10px}
+.cmp-stat{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;color:#93a8cc}
+.cmp-stat span{font-weight:700}
+.cmp-green{color:#00e87a!important}
+.cmp-amber{color:#f5a623!important}
+.cmp-red{color:#ff3355!important}
+.cmp-bar{height:4px;border-radius:2px;background:rgba(255,255,255,.06);margin-top:8px;overflow:hidden}
+.cmp-bar-fill{height:100%;border-radius:2px;background:#00e87a;transition:width 1s ease}
+.cmp-table{width:100%;border-collapse:collapse;font-size:12px}
+.cmp-table th{background:#0f1e33;color:#00d4c8;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;padding:12px 14px;text-align:left;border-bottom:2px solid rgba(0,212,200,.2)}
+.cmp-table td{padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.05);color:#93a8cc;vertical-align:middle}
+.cmp-table tr:hover td{background:rgba(255,255,255,.02)}
+.cmp-prog-name{color:#f5f9ff;font-weight:500}
+.cmp-q{color:#00e87a;font-weight:700}
+.cmp-b{color:#f5a623;font-weight:700}
+.cmp-f{color:#ff3355;font-weight:700}
+.cmp-na{color:#4e6285;font-style:italic}
+.compare-empty{text-align:center;padding:48px;color:#4e6285}
+.compare-empty .e-icon{font-size:48px;display:block;margin-bottom:14px;opacity:.3}
+.locked-compare{text-align:center;padding:48px 24px}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+.fade-up{animation:fadeUp .6s ease both}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  nav{padding:0 20px}
+  #hero{padding:100px 24px 60px}
+  .hero-float-card{display:none}
+  .hero-stats{gap:24px}
+  section:not(#hero){padding:60px 24px}
+  .features-grid{grid-template-columns:1fr}
+  .steps-grid{grid-template-columns:1fr;gap:32px}
+  .steps-grid::before{display:none}
+  .checker-inner{grid-template-columns:1fr;padding:0 24px}
+  .checker-form-wrap{border-radius:16px;border-right:1px solid rgba(255,255,255,.09)}
+  .results-panel{border-radius:16px;margin-top:16px;border-left:1px solid rgba(255,255,255,.09)}
+  .uni-scroll{grid-template-columns:repeat(3,1fr)}
+  .team-grid{grid-template-columns:1fr;max-width:380px}
+  .pricing-grid{grid-template-columns:1fr}
+  .footer-top{grid-template-columns:1fr 1fr}
+  .compare-sels{grid-template-columns:1fr}
+  .compare-summary{grid-template-columns:1fr}
+  #testimonials{padding-left:0;padding-right:0}
+  .testi-header{padding:0 24px}
+}
+</style>
+
+</head>
+<body>
+
+<!-- ══ SPLASH SCREEN ══ -->
+
+<div id="splash">
+  <div class="splash-bg"></div>
+  <div class="splash-logo-wrap">
+    <img class="splash-logo" id="splash-logo-img" src="" alt="UniPredict">
+    <div class="splash-tagline">PREDICT. MATCH. ACHIEVE.</div>
+  </div>
+  <div class="splash-divider"></div>
+  <div class="splash-headline">
+    <h1>Your Ghanaian University<br><span>Journey Starts Here.</span></h1>
+    <p>Ghana's most complete admissions predictor — 39 universities, 600+ programs, real cutoff data.</p>
+    <button class="splash-enter-btn" onclick="dismissSplash()">ENTER UNIPREDICT &nbsp;→</button>
+  </div>
+  <div class="splash-stats">
+    <div><div class="splash-stat-num">39<span>+</span></div><div class="splash-stat-label">Universities</div></div>
+    <div><div class="splash-stat-num">600<span>+</span></div><div class="splash-stat-label">Programs</div></div>
+    <div><div class="splash-stat-num">5<span>K+</span></div><div class="splash-stat-label">Students</div></div>
+    <div><div class="splash-stat-num">99<span>%</span></div><div class="splash-stat-label">Accuracy</div></div>
+  </div>
+  <div class="splash-star">✦</div>
+</div>
+
+<!-- ══ NAV ══ -->
+
+<nav>
+  <a class="nav-logo" onclick="scrollTop()">
+    <img id="nav-logo" src="" alt="UniPredict">
+    <span class="nav-logo-text">Uni<span>Predict</span></span>
+  </a>
+  <ul class="nav-links">
+    <li><a onclick="dismissSplash();scrollTo('checker')">Predictor</a></li>
+    <li><a onclick="dismissSplash();scrollTo('universities')">Universities</a></li>
+    <li><a onclick="dismissSplash();scrollTo('how')">How It Works</a></li>
+    <li><a onclick="dismissSplash();scrollTo('pricing')">Pricing</a></li>
+    <li><a class="nav-cta" onclick="dismissSplash();scrollTo('checker')">Start Checking →</a></li>
+  </ul>
+</nav>
+
+<!-- ══ TICKER ══ -->
+
+<div class="ticker-wrap">
+  <div class="ticker-track" id="tickerTrack"></div>
+</div>
+
+<!-- ══ HERO ══ -->
+
+<section id="hero" style="padding-top:130px">
+  <div class="hero-bg"><div class="hero-grid"></div></div>
+  <div class="hero-content">
+    <div class="hero-badge"><span class="hero-badge-dot"></span>Ghana's #1 University Predictor</div>
+    <h1 class="hero-title">Predict Your Future.<br>Your <span class="accent">Ghanaian University</span><br>Journey Starts Here.</h1>
+    <p class="hero-sub">Enter your WASSCE results and get an instant prediction of every program you qualify for — across 39 universities.</p>
+    <button class="btn-cta" onclick="dismissSplash();scrollTo('checker')">CHECK MY ELIGIBILITY NOW &nbsp;→</button>
+    <div class="hero-stats">
+      <div><div class="hstat-num">5<span>K+</span></div><div class="hstat-label">Students Helped</div></div>
+      <div><div class="hstat-num">39<span>+</span></div><div class="hstat-label">Universities</div></div>
+      <div><div class="hstat-num">600<span>+</span></div><div class="hstat-label">Programs</div></div>
+      <div><div class="hstat-num">99<span>%</span></div><div class="hstat-label">Accuracy</div></div>
+    </div>
+  </div>
+  <div class="hero-float-card">
+    <div class="fc-ring-wrap">
+      <svg viewBox="0 0 90 90"><circle class="fc-ring-bg" cx="45" cy="45" r="36"/><circle class="fc-ring-fill" cx="45" cy="45" r="36"/></svg>
+      <div class="fc-center"><div class="fc-pct">89%</div><div class="fc-lbl">Match</div></div>
+    </div>
+    <div class="fc-match">
+      <div class="fc-match-lbl">⚡ High Probability Match</div>
+      <div class="fc-match-prog">BSc. Computer Science</div>
+      <div class="fc-match-uni">KNUST — Aggregate: 11</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FEATURES ══ -->
+
+<section id="features">
+  <div class="section-tag">How It Works</div>
+  <h2 class="section-title">Everything you need to decide wisely.</h2>
+  <p class="section-sub">From WASSCE grades to university programs — UniPredict does it all in seconds.</p>
+  <div class="features-grid">
+    <div class="feat-card"><div class="feat-icon fi-teal">🤖</div><div class="feat-title">AI Eligibility Engine</div><p class="feat-desc">Enter your grades and get an instant, track-aware list of every program you qualify for at your chosen university.</p></div>
+    <div class="feat-card"><div class="feat-icon fi-blue">🏛️</div><div class="feat-title">39 Universities</div><p class="feat-desc">Full coverage — UG, KNUST, UCC, technical universities, private universities, nursing colleges, and teacher training.</p></div>
+    <div class="feat-card"><div class="feat-icon fi-green">🎯</div><div class="feat-title">Track Filtering</div><p class="feat-desc">Only shows programs your SHS track actually qualifies for. Science, Arts, Business, Agric, Home Ec — each filtered correctly.</p></div>
+    <div class="feat-card"><div class="feat-icon fi-amber">📐</div><div class="feat-title">Correct Aggregate Formula</div><p class="feat-desc">Best 3 of 4 core subjects + 3 electives. KNUST uses English + Maths + Science (Social Studies excluded). Both handled automatically.</p></div>
+    <div class="feat-card"><div class="feat-icon fi-teal">📄</div><div class="feat-title">PDF Report Download</div><p class="feat-desc">Download a professional PDF of your results to share with parents, teachers, or guidance counsellors. Basic & Premium plans.</p></div>
+    <div class="feat-card"><div class="feat-icon fi-blue">⚖️</div><div class="feat-title">Side-by-Side Compare</div><p class="feat-desc">Premium: Compare two universities at once. See every program, cutoff, and your eligibility status for both in one table.</p></div>
+  </div>
+</section>
+
+<!-- ══ HOW IT WORKS ══ -->
+
+<section id="how">
+  <div class="section-tag">The Process</div>
+  <h2 class="section-title">Three steps. One clear answer.</h2>
+  <p class="section-sub">No guesswork. No confusion. Just the facts about where you stand.</p>
+  <div class="steps-grid" style="margin-top:48px">
+    <div class="step"><div class="step-num">1</div><div class="step-heading">Select Your University</div><p class="step-desc">Choose from 39 Ghanaian universities across all categories — public, technical, specialised, and private.</p></div>
+    <div class="step"><div class="step-num">2</div><div class="step-heading">Enter Your Grades</div><p class="step-desc">Input your WASSCE grades, SHS track, and gender. We calculate your aggregate using the correct formula automatically.</p></div>
+    <div class="step"><div class="step-num">3</div><div class="step-heading">See Your Results</div><p class="step-desc">Instantly see every eligible program sorted by qualification status — Qualifies, Borderline, or Below cut-off.</p></div>
+  </div>
+</section>
+
+<!-- ══ CHECKER TOOL ══ -->
+
+<section id="checker">
+  <div style="padding:0 80px 32px;max-width:1360px;margin:0 auto">
+    <div class="section-tag">Eligibility Checker</div>
+    <h2 class="section-title">Check your eligibility now.</h2>
+  </div>
+  <div class="checker-inner">
+
+```
+<!-- Form -->
+<div class="checker-form-wrap">
+  <div class="form-section-title">Your Details</div>
+  <div class="form-steps">
+    <div class="fsi-dot active" id="dot0"></div>
+    <div class="fsi-dot" id="dot1"></div>
+    <div class="fsi-dot" id="dot2"></div>
+  </div>
+
+  <!-- Step 0: Institution + Track + Gender -->
+  <div class="checker-step active" id="step0">
+    <div class="step-label">Step 1 of 3 — Institution & Profile</div>
+    <div class="form-group">
+      <label class="form-label">Select University</label>
+      <div class="select-wrap">
+        <select class="form-select" id="uniSelect">
+          <option value="">-- Choose Institution --</option>
+          <optgroup label="Major Public Universities">
+            <option value="UG">University of Ghana (UG)</option>
+            <option value="KNUST">KNUST — Kumasi</option>
+            <option value="UCC">University of Cape Coast (UCC)</option>
+            <option value="UPSA">University of Professional Studies (UPSA)</option>
+            <option value="UDS">University for Development Studies (UDS)</option>
+            <option value="UHAS">University of Health & Allied Sciences (UHAS)</option>
+            <option value="UEW">University of Education, Winneba (UEW)</option>
+            <option value="UMaT">University of Mines & Technology (UMaT)</option>
+            <option value="UENR">University of Energy & Natural Resources (UENR)</option>
+          </optgroup>
+          <optgroup label="Technical Universities">
+            <option value="ATU">Accra Technical University (ATU)</option>
+            <option value="KTU">Kumasi Technical University (KTU)</option>
+            <option value="KOFORIDUA">Koforidua Technical University</option>
+            <option value="HTU">Ho Technical University</option>
+            <option value="STU">Sunyani Technical University</option>
+            <option value="TTU">Tamale Technical University</option>
+            <option value="CAPE_TECH">Cape Coast Technical University</option>
+            <option value="AAMUSTED">AAMUSTED</option>
+          </optgroup>
+          <optgroup label="Specialised Universities">
+            <option value="GCTU">Ghana Communication Technology University</option>
+            <option value="GIJ">University of Media Arts & Communication (GIJ)</option>
+            <option value="RMU">Regional Maritime University</option>
+            <option value="GIMPA">GIMPA</option>
+            <option value="NURSING">Public Nursing Training Colleges</option>
+            <option value="COE">Colleges of Education (Teacher Training)</option>
+            <option value="CKTEDAM">C.K. Tedam University</option>
+            <option value="SD_DOMBO">SD Dombo University (UBIDS)</option>
+          </optgroup>
+          <optgroup label="Private Universities">
+            <option value="ASHESI">Ashesi University</option>
+            <option value="ACAD_CITY">Academic City University College</option>
+            <option value="CENTRAL">Central University</option>
+            <option value="VVU">Valley View University</option>
+            <option value="ALL_NATIONS">All Nations University</option>
+            <option value="PENT">Pentecost University</option>
+            <option value="PRESBY">Presbyterian University</option>
+            <option value="METHODIST">Methodist University</option>
+            <option value="CATHOLIC">Catholic University of Ghana</option>
+            <option value="WISCONSIN">Wisconsin International University College</option>
+            <option value="KAAF">KAAF University College</option>
+            <option value="RADFORD">Radford University College</option>
+            <option value="CSU">Christian Service University College</option>
+            <option value="GBUC">Ghana Baptist University College</option>
+          </optgroup>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">SHS Track / Programme</label>
+      <div class="select-wrap">
+        <select class="form-select" id="trackSelect">
+          <option value="general science">General Science</option>
+          <option value="general arts">General Arts</option>
+          <option value="business">Business</option>
+          <option value="visual arts">Visual Arts</option>
+          <option value="home economics">Home Economics</option>
+          <option value="technical studies">Technical Studies</option>
+          <option value="agriculture">Agriculture</option>
+        </select>
+      </div>
+      <div style="margin-top:7px;font-size:11px;color:#4e6285;line-height:1.5">⚠️ Your track determines which programs are shown. Only programs your track qualifies for appear in results.</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Gender</label>
+      <div class="radio-group">
+        <button class="radio-btn selected" onclick="selectRadio(this,'gender')">Male</button>
+        <button class="radio-btn" onclick="selectRadio(this,'gender')">Female</button>
+      </div>
+    </div>
+    <div class="form-nav">
+      <button class="btn-next" onclick="nextStep(0)">Next: Enter Grades →</button>
+    </div>
+  </div>
+
+  <!-- Step 1: Grades -->
+  <div class="checker-step" id="step1">
+    <div class="step-label">Step 2 of 3 — WASSCE Grades</div>
+    <div class="form-group">
+      <label class="form-label">Core Subjects</label>
+      <div class="grades-2col">
+        <div><div style="font-size:11px;color:#4e6285;margin-bottom:5px">English Language</div><div class="select-wrap"><select class="form-select" id="eng"><option value="">Grade</option><option value="1">A1</option><option value="2">B2</option><option value="3">B3</option><option value="4">C4</option><option value="5">C5</option><option value="6">C6</option><option value="7">D7</option><option value="8">E8</option><option value="9">F9</option></select></div></div>
+        <div><div style="font-size:11px;color:#4e6285;margin-bottom:5px">Core Mathematics</div><div class="select-wrap"><select class="form-select" id="math"><option value="">Grade</option><option value="1">A1</option><option value="2">B2</option><option value="3">B3</option><option value="4">C4</option><option value="5">C5</option><option value="6">C6</option><option value="7">D7</option><option value="8">E8</option><option value="9">F9</option></select></div></div>
+        <div><div style="font-size:11px;color:#4e6285;margin-bottom:5px">Integrated Science</div><div class="select-wrap"><select class="form-select" id="sci"><option value="">Grade</option><option value="1">A1</option><option value="2">B2</option><option value="3">B3</option><option value="4">C4</option><option value="5">C5</option><option value="6">C6</option><option value="7">D7</option><option value="8">E8</option><option value="9">F9</option></select></div></div>
+        <div><div style="font-size:11px;color:#4e6285;margin-bottom:5px">Social Studies</div><div class="select-wrap"><select class="form-select" id="soc"><option value="">Grade</option><option value="1">A1</option><option value="2">B2</option><option value="3">B3</option><option value="4">C4</option><option value="5">C5</option><option value="6">C6</option><option value="7">D7</option><option value="8">E8</option><option value="9">F9</option></select></div></div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Elective Subjects</label>
+      <div class="grades-3col">
+        <div><div style="font-size:11px;color:#4e6285;margin-bottom:5px">Elective 1</div><div class="select-wrap"><select class="form-select" id="el1"><option value="">Grade</option><option value="1">A1</option><option value="2">B2</option><option value="3">B3</option><option value="4">C4</option><option value="5">C5</option><option value="6">C6</option><option value="7">D7</option><option value="8">E8</option><option value="9">F9</option></select></div></div>
+        <div><div style="font-size:11px;color:#4e6285;margin-bottom:5px">Elective 2</div><div class="select-wrap"><select class="form-select" id="el2"><option value="">Grade</option><option value="1">A1</option><option value="2">B2</option><option value="3">B3</option><option value="4">C4</option><option value="5">C5</option><option value="6">C6</option><option value="7">D7</option><option value="8">E8</option><option value="9">F9</option></select></div></div>
+        <div><div style="font-size:11px;color:#4e6285;margin-bottom:5px">Elective 3</div><div class="select-wrap"><select class="form-select" id="el3"><option value="">Grade</option><option value="1">A1</option><option value="2">B2</option><option value="3">B3</option><option value="4">C4</option><option value="5">C5</option><option value="6">C6</option><option value="7">D7</option><option value="8">E8</option><option value="9">F9</option></select></div></div>
+      </div>
+    </div>
+    <div style="background:#0a1628;border:1px solid rgba(0,212,200,0.15);border-radius:8px;padding:12px 14px;font-size:12px;color:#4e6285;line-height:1.6;margin-bottom:16px">
+      <strong style="color:#00d4c8">📐 Aggregate formula:</strong><br>
+      Most universities: Best <strong style="color:#f5f9ff">3 of 4</strong> cores + <strong style="color:#f5f9ff">3 electives</strong>.<br>
+      <strong style="color:#f5a623">KNUST:</strong> English + Core Maths + Integrated Science (Social Studies excluded) + 3 electives.
+    </div>
+    <div class="form-nav">
+      <button class="btn-back-sm" onclick="prevStep(1)">← Back</button>
+      <button class="btn-next" onclick="showResults()">See My Results →</button>
+    </div>
+  </div>
+
+  <!-- Step 2: Payment -->
+  <div class="checker-step" id="step2">
+    <div class="step-label">Step 3 of 3 — Unlock Results</div>
+    <div style="background:#0a1628;border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:20px;margin-bottom:20px">
+      <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:#f5f9ff;margin-bottom:8px">Unlock Your Full Report</div>
+      <div style="font-size:13px;color:#93a8cc;margin-bottom:18px;line-height:1.6">Complete a one-time payment to see all matched programs with AI career guidance.</div>
+      <div style="display:flex;gap:10px;margin-bottom:18px">
+        <div onclick="selectPlan('basic')" style="flex:1;background:#0f1e33;border:1px solid rgba(255,255,255,.09);border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:all .2s" id="plan-basic">
+          <div style="font-size:10px;color:#4e6285;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">One-time</div>
+          <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#00d4c8">GH₵5</div>
+          <div style="font-size:11px;color:#4e6285">Basic Report</div>
+        </div>
+        <div onclick="selectPlan('premium')" style="flex:1;background:rgba(0,212,200,.08);border:1px solid rgba(0,212,200,.3);border-radius:10px;padding:14px;text-align:center;cursor:pointer;transition:all .2s" id="plan-premium">
+          <div style="font-size:10px;color:#00d4c8;text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:4px">Best Value</div>
+          <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:#00d4c8">GH₵12</div>
+          <div style="font-size:11px;color:#4e6285">+ PDF + Compare</div>
+        </div>
+      </div>
+      <div id="plan-note" style="font-size:11px;color:#4e6285;margin-bottom:16px;text-align:center">Select a plan above</div>
+    </div>
+    <button class="btn-next" onclick="simulatePayment()" style="margin-bottom:12px">💳 Pay with Mobile Money</button>
+    <div style="text-align:center;font-size:12px;color:#4e6285;margin-bottom:16px">MTN MoMo · Vodafone Cash · AirtelTigo</div>
+    <div class="form-nav"><button class="btn-back-sm" onclick="prevStep(2)">← Back</button></div>
+  </div>
+</div>
+
+<!-- Results Panel -->
+<div class="results-panel">
+  <div class="loading-indicator" id="loadingIndicator" style="display:none">
+    <div class="spinner"></div>
+    <span style="font-size:13px;color:#4e6285">Calculating your results...</span>
+  </div>
+  <div class="results-placeholder" id="resultsPlaceholder">
+    <span class="rp-icon">📋</span>
+    <div class="rp-title">Your results will appear here</div>
+    <p class="rp-sub">Complete the form on the left and tap "See My Results" to check your eligibility.</p>
+  </div>
+  <div class="results-content" id="resultsContent" style="display:none">
+    <div class="result-header">
+      <div>
+        <div class="rt-uni" id="resultUniName">—</div>
+        <div class="rt-sub" id="resultUniSub">—</div>
+      </div>
+      <div class="result-agg-box">
+        <div class="agg-num" id="resultAgg">—</div>
+        <div class="agg-label">Aggregate</div>
+      </div>
+    </div>
+    <!-- Action buttons -->
+    <div class="result-actions">
+      <button class="act-btn act-btn-teal" onclick="openPdfModal()">📄 Download PDF</button>
+      <button class="act-btn act-btn-amber" onclick="openCompareModal()">⚖️ Compare Universities <span class="premium-chip">PREMIUM</span></button>
+    </div>
+    <ul class="program-list" id="programList"></ul>
+    <div class="ai-advice">
+      <div class="ai-advice-header">🤖 AI Career Guidance</div>
+      <p class="ai-advice-text" id="aiAdviceText">—</p>
+    </div>
+  </div>
+</div>
+```
+
+  </div>
+</section>
+
+<!-- ══ UNIVERSITIES ══ -->
+
+<section id="universities">
+  <div class="section-tag">Coverage</div>
+  <h2 class="section-title">39 universities covered</h2>
+  <p class="section-sub">UniPredict covers every major institution in Ghana — public, technical, specialised, and private.</p>
+  <div class="uni-scroll">
+    <div class="uni-chip"><span class="uni-chip-abbr">UG</span><span class="uni-chip-name">Univ. of Ghana</span></div>
+    <div class="uni-chip"><span class="uni-chip-abbr">KNUST</span><span class="uni-chip-name">Kwame Nkrumah</span></div>
+    <div class="uni-chip"><span class="uni-chip-abbr">UCC</span><span class="uni-chip-name">Cape Coast</span></div>
+    <div class="uni-chip"><span class="uni-chip-abbr">UPSA</span><span class="uni-chip-name">Prof. Studies</span></div>
+    <div class="uni-chip"><span class="uni-chip-abbr">UDS</span><span class="uni-chip-name">Dev. Studies</span></div>
+    <div class="uni-chip"><span class="uni-chip-abbr">UHAS</span><span class="uni-chip-name">Health Sciences</span></div>
+    <div class="uni-chip"><span class="uni-chip-abbr">UEW</span><span class="uni-chip-name">Educ. Winneba</span></div>
+    <div class="uni-chip"><span class="uni-chip-abbr">UMaT</span><span class="uni-chip-name">Mines & Tech</span></div>
+    <div class="uni-chip"><span class="uni-chip-abbr">UENR</span><span class="uni-chip-name">Energy & Nat. Res.</span></div>
+    <div class="uni-chip"><span class="uni-chip-abbr">ATU</span><span class="uni-chip-name">Accra Technical</span></div>
+    <div class="uni-chip"><span class="uni-chip-abbr">KTU</span><span class="uni-chip-name">Kumasi Technical</span></div>
+    <div class="uni-chip"><span class="uni-chip-abbr">GCTU</span><span class="uni-chip-name">Comm. Technology</span></div>
+    <div class="uni-chip"><span class="uni-chip-abbr">GIMPA</span><span class="uni-chip-name">Mgt. & Public Admin</span></div>
+    <div class="uni-chip"><span class="uni-chip-abbr">RMU</span><span class="uni-chip-name">Regional Maritime</span></div>
+    <div class="uni-chip"><span class="uni-chip-abbr">Nursing</span><span class="uni-chip-name">Nursing Colleges</span></div>
+    <div class="uni-chip"><span class="uni-chip-abbr">CoE</span><span class="uni-chip-name">Teacher Training</span></div>
+    <div class="uni-chip"><span class="uni-chip-abbr">Ashesi</span><span class="uni-chip-name">Ashesi Univ.</span></div>
+    <div class="uni-chip"><span class="uni-chip-abbr">AcadCity</span><span class="uni-chip-name">Academic City</span></div>
+    <div class="uni-chip"><span class="uni-chip-abbr">VVU</span><span class="uni-chip-name">Valley View</span></div>
+    <div class="uni-chip"><span class="uni-chip-abbr">PENT</span><span class="uni-chip-name">Pentecost</span></div>
+    <div class="uni-chip"><span class="uni-chip-abbr">Central</span><span class="uni-chip-name">Central Univ.</span></div>
+    <div class="uni-chip"><span class="uni-chip-abbr">+18</span><span class="uni-chip-name">More universities</span></div>
+  </div>
+</section>
+
+<!-- ══ TEAM ══ -->
+
+<section id="team">
+  <div class="section-tag">The People Behind It</div>
+  <h2 class="section-title">Meet the founders</h2>
+  <p class="section-sub">Two Ghanaians who experienced the confusion of university admissions firsthand — and built the solution.</p>
+  <div class="team-grid">
+    <div class="team-card">
+      <div class="team-photo-wrap">
+        <img id="founder-photo" src="" alt="CEO" class="team-photo">
+        <div class="team-photo-overlay"></div>
+        <div class="founder-badge">👑 Founder</div>
+      </div>
+      <div class="team-info">
+        <div class="team-role-badge">⚡ CEO & Founder</div>
+        <div class="team-name">Alexander</div>
+        <div class="team-title">Chief Executive Officer</div>
+        <p class="team-bio">Visionary behind UniPredict. Identified the gap in Ghana's admissions process and built the platform to bridge it — real cutoff data, AI guidance, track-aware filtering.</p>
+        <div class="team-socials">
+          <a class="team-social-btn" href="https://www.linkedin.com/in/alexander-piasa-asiamah-557265387?trk=contact-info" target="_blank" rel="noopener">in LinkedIn</a>
+          <a class="team-social-btn" href="mailto:alexanderpiasahasiamah@gmail.com">✉ Email</a>
+        </div>
+      </div>
+    </div>
+    <div class="team-card">
+      <div class="team-photo-wrap">
+        <img id="cofounder-photo" src="" alt="CTO" class="team-photo">
+        <div class="team-photo-overlay"></div>
+        <div class="founder-badge">🛠️ Co-Founder</div>
+      </div>
+      <div class="team-info">
+        <div class="team-role-badge">💻 CTO & Co-Founder</div>
+        <div class="team-name">Gideon Appianing</div>
+        <div class="team-title">Chief Technology Officer</div>
+        <p class="team-bio">Technical architect of UniPredict. Built the eligibility engine, KNUST-aware aggregate formula, track filtering system, and the database powering every prediction.</p>
+        <div class="team-socials">
+          <a class="team-social-btn" href="https://www.linkedin.com/in/gideon-appianing-9660b736b?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank" rel="noopener">in LinkedIn</a>
+          <a class="team-social-btn" href="mailto:gideonappianing769@gmail.com">✉ Email</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ TESTIMONIALS ══ -->
+
+<section id="testimonials">
+  <div class="testi-header">
+    <div class="section-tag">Success Stories</div>
+    <h2 class="section-title">Students who found their path</h2>
+  </div>
+  <div class="testi-track" id="testiTrack"></div>
+</section>
+
+<!-- ══ PRICING ══ -->
+
+<section id="pricing">
+  <div class="section-tag">Pricing</div>
+  <h2 class="section-title">Simple, transparent pricing</h2>
+  <p class="section-sub">Pay once per check. No subscriptions. Download PDF and compare universities on Premium.</p>
+  <div class="pricing-grid">
+    <div class="pricing-card">
+      <div class="plan-name">Basic</div>
+      <div class="plan-price"><span class="plan-currency">GH₵</span><span class="plan-amount">5</span></div>
+      <div class="plan-period">per eligibility check</div>
+      <ul class="plan-features">
+        <li>Full program eligibility list</li>
+        <li>Correct aggregate calculation</li>
+        <li>Track-filtered results</li>
+        <li>PDF report download</li>
+        <li>Lifetime result access</li>
+        <li class="disabled">AI Career Guidance</li>
+        <li class="disabled">Side-by-side Compare</li>
+      </ul>
+      <button class="btn-plan btn-plan-outline" onclick="selectPlan('basic');scrollTo('checker')">Get Basic — GH₵5</button>
+    </div>
+    <div class="pricing-card featured">
+      <div class="plan-name">Premium</div>
+      <div class="plan-price"><span class="plan-currency">GH₵</span><span class="plan-amount">12</span></div>
+      <div class="plan-period">per eligibility check</div>
+      <ul class="plan-features">
+        <li>Everything in Basic</li>
+        <li>🤖 AI Career Guidance</li>
+        <li>⚖️ Side-by-side Compare</li>
+        <li>📄 PDF Report Download</li>
+        <li>Gender-aware cutoffs</li>
+        <li>Priority SMS delivery</li>
+        <li>Lifetime result access</li>
+      </ul>
+      <button class="btn-plan btn-plan-featured" onclick="selectPlan('premium');scrollTo('checker')">Get Premium — GH₵12</button>
+    </div>
+    <div class="pricing-card">
+      <div class="plan-name">Bundle</div>
+      <div class="plan-price"><span class="plan-currency">GH₵</span><span class="plan-amount">25</span></div>
+      <div class="plan-period">check 5 universities</div>
+      <ul class="plan-features">
+        <li>5 university checks</li>
+        <li>Everything in Premium</li>
+        <li>Side-by-side Compare</li>
+        <li>PDF for each check</li>
+        <li>Priority support</li>
+        <li>Scholarship matching</li>
+        <li>Best value for applicants</li>
+      </ul>
+      <button class="btn-plan btn-plan-outline" onclick="selectPlan('premium');scrollTo('checker')">Get Bundle — GH₵25</button>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOOTER ══ -->
+
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <img id="footer-logo" src="" alt="UniPredict" style="height:44px;width:auto;object-fit:contain">
+      <p>Empowering every Ghanaian student to make informed, confident decisions about their university future — before they spend a cedi on application forms.</p>
+    </div>
+    <div>
+      <div class="footer-col-title">Platform</div>
+      <ul class="footer-links">
+        <li><a onclick="scrollTo('checker')">Check Eligibility</a></li>
+        <li><a onclick="scrollTo('how')">How It Works</a></li>
+        <li><a onclick="scrollTo('universities')">Universities</a></li>
+        <li><a onclick="scrollTo('pricing')">Pricing</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Company</div>
+      <ul class="footer-links">
+        <li><a onclick="scrollTo('team')">Our Team</a></li>
+        <li><a href="#">About UniPredict</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Contact Us</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Resources</div>
+      <ul class="footer-links">
+        <li><a href="#">All Programs</a></li>
+        <li><a href="#">Admissions Timeline</a></li>
+        <li><a href="#">WASSCE Calculator</a></li>
+        <li><a href="#">FAQ</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 UniPredict Ghana™ — All Rights Reserved</span>
+    <span>Built with 🔥 for Ghanaian students</span>
+  </div>
+</footer>
+
+<!-- ══ HIDDEN PDF REPORT (print only) ══ -->
+
+<div id="pdf-report" style="display:none">
+  <div class="pdf-watermark">UniPredict</div>
+  <div class="pdf-hdr">
+    <div class="pdf-uni" id="pdf-uni-name">—</div>
+    <div class="pdf-meta" id="pdf-meta">—</div>
+  </div>
+  <div style="display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap;margin-bottom:8px">
+    <div class="pdf-agg-box"><div class="pdf-agg-num" id="pdf-agg">—</div><div class="pdf-agg-lbl">Aggregate Score</div></div>
+    <div style="padding-top:10px">
+      <div style="font-size:13px;color:#555;margin-bottom:6px">Track: <strong id="pdf-track">—</strong></div>
+      <div style="font-size:13px;color:#555">Gender: <strong id="pdf-gender">—</strong></div>
+    </div>
+  </div>
+  <div class="pdf-sec-title">Program Eligibility Results</div>
+  <div id="pdf-list"></div>
+  <div class="pdf-ftr">Generated by UniPredict Ghana | PREDICT. MATCH. ACHIEVE.<br><span id="pdf-date"></span></div>
+</div>
+
+<!-- ══ PDF MODAL ══ -->
+
+<div class="overlay-modal" id="pdf-modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="document.getElementById('pdf-modal').classList.remove('open')">✕</button>
+    <span class="modal-icon">📄</span>
+    <div class="modal-title">Download PDF Report</div>
+    <p class="modal-sub">Save a professional PDF of your eligibility results to share with parents, teachers, or guidance counsellors.</p>
+    <div id="pdf-plan-msg"></div>
+    <button class="modal-btn primary" id="pdf-dl-btn" onclick="executePdf()">⬇️ Download PDF Now</button>
+    <button class="modal-btn secondary" onclick="document.getElementById('pdf-modal').classList.remove('open')">Cancel</button>
+  </div>
+</div>
+
+<!-- ══ COMPARE MODAL ══ -->
+
+<div class="compare-overlay" id="compare-modal">
+  <div class="compare-box">
+    <div class="compare-header">
+      <div>
+        <div class="compare-title-text">⚖️ Side-by-Side University Comparison</div>
+        <div style="font-size:12px;color:#93a8cc;margin-top:3px">Compare programs and cutoffs across two universities</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="compare-prem-badge">⭐ Premium</span>
+        <button class="compare-close-btn" onclick="document.getElementById('compare-modal').classList.remove('open')">✕ Close</button>
+      </div>
+    </div>
+    <div class="compare-sels">
+      <div><div class="compare-sel-lbl">University A</div><select class="compare-sel" id="cmp-a"><option value="">-- Select University A --</option></select></div>
+      <div><div class="compare-sel-lbl">University B</div><select class="compare-sel" id="cmp-b"><option value="">-- Select University B --</option></select></div>
+    </div>
+    <button class="compare-run-btn" id="cmp-run-btn" onclick="runComparison()">⚡ Compare Universities</button>
+    <div id="compare-results">
+      <div class="compare-empty"><span class="e-icon">🏛️</span><div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:#93a8cc;margin-bottom:8px">Select two universities above</div><div style="font-size:13px;color:#4e6285">We'll show every program, cutoff, and your eligibility for both universities side by side.</div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+// ASSETS: inject logo + photos after DOM loads
+// ══════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', function() {
+  if (typeof LOGO_SRC !== 'undefined') {
+    ['nav-logo','splash-logo-img','footer-logo'].forEach(id => {
+      var el = document.getElementById(id);
+      if (el) el.src = LOGO_SRC;
+    });
+  }
+  if (typeof FOUNDER_SRC !== 'undefined') {
+    var fp = document.getElementById('founder-photo');
+    if (fp) fp.src = FOUNDER_SRC;
+  }
+  if (typeof COFOUNDER_SRC !== 'undefined') {
+    var cp = document.getElementById('cofounder-photo');
+    if (cp) cp.src = COFOUNDER_SRC;
+  }
+  buildTicker();
+  buildTestimonials();
+  populateCmpDropdowns();
+});
+
+// ══════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════
+function scrollTo(id) {
+  var el = document.getElementById(id);
+  if (el) el.scrollIntoView({behavior:'smooth'});
+}
+function scrollTop() { window.scrollTo({top:0,behavior:'smooth'}); }
+
+// ══════════════════════════════════════════════
+// SPLASH
+// ══════════════════════════════════════════════
+function dismissSplash() {
+  var s = document.getElementById('splash');
+  if (!s || s.style.display === 'none') return;
+  s.classList.add('hiding');
+  setTimeout(function(){ s.style.display = 'none'; }, 650);
+}
+setTimeout(function(){ dismissSplash(); }, 9000);
+
+// ══════════════════════════════════════════════
+// TICKER
+// ══════════════════════════════════════════════
+function buildTicker() {
+  var items = [
+    '🎓 Admissions now open — UG, KNUST, UCC, UPSA, Nursing & more',
+    '📣 39 universities covered — Ghana\'s most complete admissions database',
+    '⚡ New: KNUST-specific aggregate formula now implemented',
+    '📄 Premium: Download PDF report of your results',
+    '⚖️ Premium: Compare two universities side by side',
+    '✅ Track filtering — only see programs your SHS track qualifies for',
+    '🎓 Admissions now open — UG, KNUST, UCC, UPSA, Nursing & more',
+    '📣 39 universities covered — Ghana\'s most complete admissions database',
+  ];
+  var t = document.getElementById('tickerTrack');
+  if (!t) return;
+  items.concat(items).forEach(function(item) {
+    var span = document.createElement('span');
+    span.className = 'ticker-item';
+    span.innerHTML = '<span class="ticker-dot"></span>' + item;
+    t.appendChild(span);
+  });
+}
+
+// ══════════════════════════════════════════════
+// TESTIMONIALS
+// ══════════════════════════════════════════════
+function buildTestimonials() {
+  var students = [
+    {name:'Kwame Asante', school:'PRESEC, Legon', quote:'UniPredict told me exactly which programs I qualified for. Got into Computer Science at UG on my first try!', program:'BSc. Computer Science', agg:11, color:'#4f8fff'},
+    {name:'Abena Owusu', school:'Wesley Girls, Cape Coast', quote:'The AI career guidance was different from anything else. It helped me pick Optometry over Nursing and I have no regrets.', program:'Doctor of Optometry', agg:12, color:'#22d47a'},
+    {name:'Kofi Mensah', school:'Achimota School', quote:'I was scared my aggregate wasn\'t good enough. UniPredict showed me I qualified for more programs than I thought!', program:'BSc. Engineering', agg:15, color:'#f5c842'},
+    {name:'Ama Sarpong', school:'Mfantsipim School', quote:'The track filtering is so accurate. It only showed me programs I actually qualified for as a General Arts student.', program:'BSc. Nursing', agg:16, color:'#ff8c42'},
+    {name:'Yaw Darko', school:'Prempeh College', quote:'The KNUST formula fix is a game changer. My real aggregate was different from what other sites calculated!', program:'BSc. Pharmacy', agg:9, color:'#c042f5'},
+    {name:'Efua Asiedu', school:'Holy Child School', quote:'My teacher said my aggregate won\'t get me into UPSA. UniPredict proved him wrong — I qualified for 3 programs there!', program:'LLB Law', agg:18, color:'#42c5f5'},
+  ];
+  var t = document.getElementById('testiTrack');
+  if (!t) return;
+  var all = students.concat(students);
+  all.forEach(function(s) {
+    var ini = s.name.split(' ').map(function(n){return n[0]}).join('');
+    var div = document.createElement('div');
+    div.className = 'testi-card';
+    div.innerHTML = '<div class="testi-top"><div class="testi-avatar" style="background:'+s.color+'22;color:'+s.color+'">'+ini+'</div><div><div class="testi-name">'+s.name+'</div><div class="testi-school">'+s.school+'</div></div></div><p class="testi-quote">"'+s.quote+'"</p><div class="testi-footer"><span class="testi-program">✓ '+s.program+'</span><span class="testi-agg">Agg: '+s.agg+'</span></div>';
+    t.appendChild(div);
+  });
+}
+
+// ══════════════════════════════════════════════
+// PLAN SELECTION
+// ══════════════════════════════════════════════
+var currentPlan = 'none';
+
+function selectPlan(plan) {
+  currentPlan = plan;
+  var noteEl = document.getElementById('plan-note');
+  if (noteEl) {
+    noteEl.textContent = plan === 'premium'
+      ? '✅ Premium selected — includes PDF + Compare + AI Guidance'
+      : '✅ Basic selected — includes PDF download';
+    noteEl.style.color = '#00e87a';
+  }
+  // Highlight selected card
+  ['basic','premium'].forEach(function(p) {
+    var card = document.getElementById('plan-' + p);
+    if (!card) return;
+    card.style.border = p === plan ? '2px solid #00d4c8' : '1px solid rgba(255,255,255,.09)';
+  });
+}
+
+// ══════════════════════════════════════════════
+// MULTI-STEP FORM
+// ══════════════════════════════════════════════
+var currentStep = 0;
+
+function nextStep(from) {
+  if (from === 0) {
+    if (!document.getElementById('uniSelect').value) {
+      alert('Please select a university first.');
+      return;
+    }
+    setStep(1);
+  } else if (from === 1) {
+    showResults();
+  }
+}
+
+function prevStep(from) {
+  setStep(from - 1);
+}
+
+function setStep(n) {
+  document.querySelectorAll('.checker-step').forEach(function(s,i){ s.classList.toggle('active', i===n); });
+  document.querySelectorAll('.fsi-dot').forEach(function(d,i){
+    d.classList.toggle('active', i===n);
+    d.classList.toggle('done', i<n);
+  });
+  currentStep = n;
+}
+
+function selectRadio(btn, group) {
+  btn.closest('.radio-group').querySelectorAll('.radio-btn').forEach(function(b){ b.classList.remove('selected'); });
+  btn.classList.add('selected');
+}
+
+// ══════════════════════════════════════════════
+// AGGREGATE CALCULATOR
+// Standard: Best 3 of 4 cores + 3 electives
+// KNUST:    English + Maths + Science (no Social Studies) + 3 electives
+// ══════════════════════════════════════════════
+function calcAggregate(uniKey) {
+  var el = function(id){ return parseInt(document.getElementById(id).value) || 9; };
+  var coreSum;
+  if (uniKey === 'KNUST') {
+    coreSum = el('eng') + el('math') + el('sci');
+  } else {
+    var cores = [el('eng'), el('math'), el('sci'), el('soc')].sort(function(a,b){return a-b;});
+    coreSum = cores[0] + cores[1] + cores[2];
+  }
+  return coreSum + el('el1') + el('el2') + el('el3');
+}
+
+// ══════════════════════════════════════════════
+// TRACK ELIGIBILITY ENGINE
+// ══════════════════════════════════════════════
+function isEligibleByTrack(programName, college, track) {
+  var p = programName.toLowerCase();
+  var t = track.toLowerCase();
+
+  var sciOnly = ['mbchb','medicine','surgery','dental','pharmacy','physician','engineering','biomedical','biochemistry','optometry','radiography','physiotherapy','occupational therapy','dietetics','midwifery','laboratory','medical imaging','orthotic','prosthetic','speech language','anesthesia','petroleum','geological','geomatic','metallurgical','aerospace','chemical engineering','mechanical engineering','electrical engineering','civil engineering','computer engineering','telecommunication engineering','marine engineering','materials engineering','renewable energy engineering','automobile engineering','mining engineering','minerals engineering','natural gas engineering','environmental and safety engineering','veterinary','herbal medicine','meteorology'];
+  var sciOrHe = ['nursing','bsc nursing','bachelor of nursing','community nutrition','nutrition','family and consumer','home economics','midwifery'];
+  var biz     = ['accounting','finance','banking','marketing','business administration','bba','bcom','real estate management','procurement','human resource','secretaryship','purchasing and supply','entrepreneurship','logistics'];
+  var arts    = ['bachelor of laws','llb','law','political science','sociology','social work','languages','linguistics','literature','history','geography','religious studies','philosophy','communication studies','theatre','drama','music','fine art','graphic design','african studies','anthropology','population','development studies','public administration','french','arabic','spanish','german','information science','social sciences'];
+  var visArts = ['graphic design','communication design','fine art','fashion design','ceramics','textile design','interior design','animation','integrated rural art'];
+  var agric   = ['agriculture','agribusiness','agronomy','soil science','animal science','horticulture','forestry','aquaculture','fisheries','landscape','packaging technology','food systems','natural resources'];
+  var computing=['computer science','information technology','information systems','cyber security','software','data science','data analytics','artificial intelligence','computing mathematics','btech computer','hnd computer'];
+
+  var isSciOnly  = sciOnly.some(function(k){return p.includes(k);});
+  var isSciOrHe  = sciOrHe.some(function(k){return p.includes(k);});
+  var isBiz      = biz.some(function(k){return p.includes(k);});
+  var isArts     = arts.some(function(k){return p.includes(k);});
+  var isVisArts  = visArts.some(function(k){return p.includes(k);});
+  var isAgric    = agric.some(function(k){return p.includes(k);});
+  var isComputing= computing.some(function(k){return p.includes(k);});
+
+  if (t === 'general science') {
+    return !(isVisArts && !isComputing);
+  }
+  if (t === 'general arts') {
+    if (isSciOnly) return false;
+    if (isAgric && !isSciOrHe) return false;
+    return true;
+  }
+  if (t === 'business') {
+    if (isSciOnly) return false;
+    if (isAgric) return false;
+    if (isVisArts && !isComputing) return false;
+    return true;
+  }
+  if (t === 'visual arts') {
+    if (isSciOnly) return false;
+    if (isSciOrHe && !isComputing) return false;
+    if (isAgric) return false;
+    return isVisArts || isComputing || isArts || isBiz || p.includes('communication') || p.includes('media') || p.includes('development planning') || p.includes('real estate');
+  }
+  if (t === 'agriculture') {
+    if (isSciOnly && !isAgric) return false;
+    return isAgric || isComputing || isBiz || p.includes('natural resources') || p.includes('environmental') || p.includes('food science') || p.includes('nutrition') || p.includes('biotechnology') || p.includes('veterinary');
+  }
+  if (t === 'home economics') {
+    if (isSciOnly && !isSciOrHe) return false;
+    return isSciOrHe || p.includes('nutrition') || p.includes('dietetics') || p.includes('home economics') || p.includes('family') || p.includes('consumer') || p.includes('nursing') || p.includes('health') || isBiz || isComputing || isArts;
+  }
+  if (t === 'technical studies') {
+    if (isVisArts && !isComputing) return false;
+    if (isArts && !isComputing) return false;
+    if (p.includes('law') || p.includes('theology') || p.includes('mbchb') || p.includes('medicine and bachelor') || p.includes('pharmacy') || p.includes('optometry')) return false;
+    return true;
+  }
+  return true;
+}
+
+var trackNames = {
+  'general science':'General Science','general arts':'General Arts','business':'Business',
+  'visual arts':'Visual Arts','home economics':'Home Economics','technical studies':'Technical Studies','agriculture':'Agriculture'
+};
+
+// ══════════════════════════════════════════════
+// SHOW RESULTS
+// ══════════════════════════════════════════════
+function showResults() {
+  var uniKey   = document.getElementById('uniSelect').value;
+  var uniSel   = document.getElementById('uniSelect');
+  var uniName  = uniKey ? uniSel.options[uniSel.selectedIndex].text : '—';
+  var track    = document.getElementById('trackSelect').value;
+  var gBtn     = document.querySelector('.radio-btn.selected');
+  var gender   = gBtn ? gBtn.textContent.trim() : 'Male';
+  var agg      = calcAggregate(uniKey);
+
+  // Update results header
+  document.getElementById('resultUniName').textContent = uniName;
+  document.getElementById('resultUniSub').textContent  = trackNames[track] + ' — Aggregate: ' + agg;
+  document.getElementById('resultAgg').textContent     = agg;
+
+  // Show loading
+  document.getElementById('resultsPlaceholder').style.display = 'none';
+  document.getElementById('resultsContent').style.display     = 'none';
+  document.getElementById('loadingIndicator').style.display   = 'flex';
+
+  setTimeout(function() {
+    document.getElementById('loadingIndicator').style.display = 'none';
+    renderResults(uniKey, agg, track, gender, uniName);
+    document.getElementById('resultsContent').style.display   = 'block';
+  }, 900);
+}
+
+function renderResults(uniKey, agg, track, gender, uniName) {
+  var uniData = (typeof universityDB !== 'undefined') ? universityDB[uniKey] : null;
+  var allProgs = uniData ? uniData.programs : [];
+  var list     = document.getElementById('programList');
+  list.innerHTML = '';
+
+  if (!allProgs.length) {
+    list.innerHTML = '<li class="program-item"><div class="pi-name">Program data coming soon for this university.</div></li>';
+    document.getElementById('aiAdviceText').textContent = typeof aiAdvice !== 'undefined' ? (aiAdvice[uniKey] || aiAdvice.default) : '';
+    return;
+  }
+
+  // Filter by track
+  var eligible = allProgs.filter(function(p){ return isEligibleByTrack(p.name, p.college, track); });
+  var ineligCount = allProgs.length - eligible.length;
+
+  // Apply gender cutoffs + status
+  var assessed = eligible.map(function(p) {
+    var cut = (gender === 'Female' && p.cutoff_female) ? p.cutoff_female : p.cutoff;
+    return Object.assign({}, p, {
+      cut: cut,
+      qualifies:   agg <= cut,
+      borderline: (agg > cut) && (agg <= cut + 3)
+    });
+  });
+
+  // Sort: qualifies → borderline → fail → by cutoff
+  assessed.sort(function(a,b){
+    if (a.qualifies && !b.qualifies) return -1;
+    if (!a.qualifies && b.qualifies) return 1;
+    if (a.borderline && !b.borderline) return -1;
+    if (!a.borderline && b.borderline) return 1;
+    return a.cut - b.cut;
+  });
+
+  // Render
+  assessed.forEach(function(p) {
+    var li = document.createElement('li');
+    li.className = 'program-item';
+    var badgeClass = p.qualifies ? 'qualify' : p.borderline ? 'borderline' : '';
+    var badgeStyle = (!p.qualifies && !p.borderline) ? 'background:rgba(255,51,85,.12);color:#ff3355;border:1px solid rgba(255,51,85,.25)' : '';
+    var badgeText  = p.qualifies ? '✓ Qualifies' : p.borderline ? '~ Borderline' : '✗ Below cut-off';
+    var noteHtml   = p.notes ? '<div class="pi-note">ℹ️ ' + p.notes + '</div>' : '';
+    li.innerHTML = '<div><div class="pi-name">'+p.name+'</div><div class="pi-cut">'+p.college+' · Cut-off: '+p.cut+'</div>'+noteHtml+'</div><div class="pi-badge '+badgeClass+'" style="'+badgeStyle+'">'+badgeText+'</div>';
+    list.appendChild(li);
+  });
+
+  // Summary bar
+  var qualCount = assessed.filter(function(p){return p.qualifies;}).length;
+  var sumDiv = document.createElement('div');
+  sumDiv.style.cssText = 'margin-top:14px;padding:12px 16px;background:rgba(0,212,200,.12);border:1px solid rgba(0,212,200,.25);border-radius:10px;font-size:13px;color:#00d4c8;font-weight:600;display:flex;flex-direction:column;gap:4px';
+  sumDiv.innerHTML = '<span>✓ You qualify for <strong>'+qualCount+'</strong> out of <strong>'+assessed.length+'</strong> eligible programs at '+uniName+'</span>'
+    + (ineligCount > 0 ? '<span style="font-size:11px;color:#93a8cc;font-weight:400">⚠️ '+ineligCount+' program'+(ineligCount>1?'s':'')+' hidden — not available for <strong>'+trackNames[track]+'</strong> students</span>' : '');
+  list.appendChild(sumDiv);
+
+  // AI advice
+  var advice = (typeof aiAdvice !== 'undefined') ? (aiAdvice[uniKey] || aiAdvice.default) : 'Complete the form to see advice.';
+  document.getElementById('aiAdviceText').textContent = advice;
+}
+
+// ══════════════════════════════════════════════
+// PAYMENT
+// ══════════════════════════════════════════════
+function simulatePayment() {
+  var btn = event.target;
+  if (currentPlan === 'none') {
+    alert('Please select a plan (Basic GH₵5 or Premium GH₵12) before paying.');
+    return;
+  }
+  btn.textContent = '⏳ Processing...';
+  btn.disabled = true;
+  setTimeout(function(){
+    btn.textContent = '✅ Payment Successful!';
+    btn.style.background = '#00e87a';
+    btn.style.color = '#000';
+    setTimeout(function(){ scrollTo('checker'); showResults(); }, 600);
+  }, 2000);
+}
+
+// ══════════════════════════════════════════════
+// PDF DOWNLOAD
+// ══════════════════════════════════════════════
+function openPdfModal() {
+  var rc = document.getElementById('resultsContent');
+  if (!rc || rc.style.display === 'none' || rc.style.display === '') {
+    alert('⚠️ Please run a prediction first before downloading your report.');
+    return;
+  }
+  var msgEl  = document.getElementById('pdf-plan-msg');
+  var dlBtn  = document.getElementById('pdf-dl-btn');
+  if (currentPlan !== 'none') {
+    msgEl.innerHTML = '<div style="background:rgba(0,232,122,.1);border:1px solid rgba(0,232,122,.25);border-radius:10px;padding:12px;margin-bottom:16px;font-size:13px;color:#00e87a;font-weight:600">✓ Your plan includes PDF download</div>';
+    dlBtn.disabled = false; dlBtn.style.opacity = '1';
+  } else {
+    msgEl.innerHTML = '<div class="lock-box"><div style="font-size:24px;margin-bottom:6px">🔒</div><div class="lock-text">PDF download requires a Basic (GH₵5) or Premium (GH₵12) plan.<br><a href="#pricing" onclick="document.getElementById(\'pdf-modal\').classList.remove(\'open\')">View pricing ↓</a></div></div>';
+    dlBtn.disabled = true; dlBtn.style.opacity = '0.4';
+  }
+  document.getElementById('pdf-modal').classList.add('open');
+}
+
+function executePdf() {
+  if (currentPlan === 'none') return;
+
+  var uniSel  = document.getElementById('uniSelect');
+  var trackSel= document.getElementById('trackSelect');
+  var gBtn    = document.querySelector('.radio-btn.selected');
+
+  document.getElementById('pdf-uni-name').textContent = document.getElementById('resultUniName').textContent;
+  document.getElementById('pdf-meta').textContent     = document.getElementById('resultUniSub').textContent;
+  document.getElementById('pdf-agg').textContent      = document.getElementById('resultAgg').textContent;
+  document.getElementById('pdf-track').textContent    = trackSel ? trackSel.options[trackSel.selectedIndex].text : '—';
+  document.getElementById('pdf-gender').textContent   = gBtn ? gBtn.textContent.trim() : '—';
+  document.getElementById('pdf-date').textContent     = 'Report generated: ' + new Date().toLocaleDateString('en-GH', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+  var pdfList = document.getElementById('pdf-list');
+  pdfList.innerHTML = '';
+  document.querySelectorAll('#programList .program-item').forEach(function(item) {
+    var nameEl  = item.querySelector('.pi-name');
+    var cutEl   = item.querySelector('.pi-cut');
+    var badgeEl = item.querySelector('.pi-badge');
+    if (!nameEl) return;
+    var status = badgeEl ? badgeEl.textContent.trim() : '';
+    var isQ = status.includes('Qualifies');
+    var isB = status.includes('Borderline');
+    var row = document.createElement('div');
+    row.className = 'pdf-row';
+    row.innerHTML = '<div style="flex:1"><div style="font-weight:600;color:#111">'+nameEl.textContent+'</div><div style="font-size:11px;color:#666;margin-top:1px">'+(cutEl?cutEl.textContent:'')+'</div></div>'
+      + '<span class="pdf-badge '+(isQ?'q':isB?'b':'f')+'">'+status+'</span>';
+    pdfList.appendChild(row);
+  });
+
+  var report = document.getElementById('pdf-report');
+  report.style.display = 'block';
+  document.getElementById('pdf-modal').classList.remove('open');
+  setTimeout(function(){
+    window.print();
+    setTimeout(function(){ report.style.display = 'none'; }, 1500);
+  }, 300);
+}
+
+// ══════════════════════════════════════════════
+// COMPARE (Premium)
+// ══════════════════════════════════════════════
+function populateCmpDropdowns() {
+  var groups = {
+    'Major Public Universities': ['UG','KNUST','UCC','UPSA','UDS','UHAS','UEW','UMaT','UENR'],
+    'Technical Universities':    ['ATU','KTU','KOFORIDUA','HTU','STU','TTU','CAPE_TECH','AAMUSTED'],
+    'Specialised':               ['GCTU','GIJ','RMU','GIMPA','NURSING','COE','CKTEDAM','SD_DOMBO'],
+    'Private Universities':      ['ASHESI','ACAD_CITY','CENTRAL','VVU','ALL_NATIONS','PENT','PRESBY','METHODIST','CATHOLIC','WISCONSIN','KAAF','RADFORD','CSU','GBUC']
+  };
+  ['cmp-a','cmp-b'].forEach(function(selId) {
+    var sel = document.getElementById(selId);
+    Object.entries(groups).forEach(function(entry) {
+      var og = document.createElement('optgroup');
+      og.label = entry[0];
+      entry[1].forEach(function(key) {
+        if (typeof universityDB === 'undefined' || !universityDB[key]) return;
+        var opt = document.createElement('option');
+        opt.value = key;
+        opt.textContent = universityDB[key].name;
+        og.appendChild(opt);
+      });
+      sel.appendChild(og);
+    });
+  });
+}
+
+function openCompareModal() {
+  var modal   = document.getElementById('compare-modal');
+  var runBtn  = document.getElementById('cmp-run-btn');
+  var cmpA    = document.getElementById('cmp-a');
+  var cmpB    = document.getElementById('cmp-b');
+  var results = document.getElementById('compare-results');
+
+  if (currentPlan !== 'premium') {
+    cmpA.disabled = cmpB.disabled = runBtn.disabled = true;
+    runBtn.style.opacity = '0.4';
+    results.innerHTML = '<div class="locked-compare"><div style="font-size:52px;margin-bottom:14px">🔒</div><div style="font-family:\'Syne\',sans-serif;font-size:18px;font-weight:800;color:#f5a623;margin-bottom:10px">Premium Feature</div><div style="font-size:14px;color:#93a8cc;max-width:360px;margin:0 auto 24px;line-height:1.6">Side-by-side comparison is available on the <strong style="color:#f5a623">Premium (GH₵12)</strong> plan.</div><button onclick="document.getElementById(\'compare-modal\').classList.remove(\'open\');selectPlan(\'premium\');scrollTo(\'checker\')" style="background:#00d4c8;color:#000;font-family:\'Syne\',sans-serif;font-weight:800;font-size:14px;padding:14px 32px;border-radius:10px;border:none;cursor:pointer">⭐ Upgrade to Premium</button></div>';
+  } else {
+    cmpA.disabled = cmpB.disabled = runBtn.disabled = false;
+    runBtn.style.opacity = '1';
+  }
+  modal.classList.add('open');
+}
+
+function runComparison() {
+  var keyA = document.getElementById('cmp-a').value;
+  var keyB = document.getElementById('cmp-b').value;
+  if (!keyA || !keyB) { alert('Please select both universities.'); return; }
+  if (keyA === keyB)   { alert('Please select two different universities.'); return; }
+
+  var uniA  = universityDB[keyA];
+  var uniB  = universityDB[keyB];
+  var trackSel = document.getElementById('trackSelect');
+  var track    = trackSel ? trackSel.value : 'general science';
+  var gBtn     = document.querySelector('.radio-btn.selected');
+  var gender   = gBtn ? gBtn.textContent.trim() : 'Male';
+  var agg      = parseInt(document.getElementById('resultAgg').textContent) || 18;
+
+  function assess(uni, uKey) {
+    return (uni.programs || []).filter(function(p){ return isEligibleByTrack(p.name, p.college, track); })
+      .map(function(p){
+        var cut = (gender==='Female' && p.cutoff_female) ? p.cutoff_female : p.cutoff;
+        return Object.assign({},p,{cut:cut, qualifies:agg<=cut, borderline:(agg>cut)&&(agg<=cut+3), uKey:uKey});
+      });
+  }
+
+  var pa = assess(uniA, keyA), pb = assess(uniB, keyB);
+  var qa = pa.filter(function(p){return p.qualifies;}).length;
+  var qb = pb.filter(function(p){return p.qualifies;}).length;
+  var ba = pa.filter(function(p){return p.borderline;}).length;
+  var bb = pb.filter(function(p){return p.borderline;}).length;
+
+  var html = '<div class="compare-summary">';
+  function sumCard(uni, progs, q, b) {
+    var total = progs.length;
+    var pct = total ? Math.round(q/total*100) : 0;
+    return '<div class="cmp-card"><div class="cmp-card-uni">🏛️ '+uni.name+'</div>'
+      +'<div class="cmp-stat">Eligible programs: <span>'+total+'</span></div>'
+      +'<div class="cmp-stat">Qualify: <span class="cmp-green">'+q+'</span></div>'
+      +'<div class="cmp-stat">Borderline: <span class="cmp-amber">'+b+'</span></div>'
+      +'<div class="cmp-stat">Below cut-off: <span class="cmp-red">'+(total-q-b)+'</span></div>'
+      +'<div class="cmp-bar"><div class="cmp-bar-fill" style="width:'+pct+'%"></div></div></div>';
+  }
+  html += sumCard(uniA,pa,qa,ba) + sumCard(uniB,pb,qb,bb);
+  html += '</div>';
+
+  // Build name-keyed maps
+  var mapA = {}, mapB = {};
+  pa.forEach(function(p){ mapA[p.name] = p; });
+  pb.forEach(function(p){ mapB[p.name] = p; });
+  var allNames = Array.from(new Set(pa.map(function(p){return p.name;}).concat(pb.map(function(p){return p.name;}))));
+
+  function cell(prog) {
+    if (!prog) return '<td class="cmp-na">—</td>';
+    if (prog.qualifies)   return '<td class="cmp-q">✓ Qualifies<br><span style="font-size:10px;font-weight:400;color:#4e6285">Cut-off: '+prog.cut+'</span></td>';
+    if (prog.borderline)  return '<td class="cmp-b">~ Borderline<br><span style="font-size:10px;font-weight:400;color:#4e6285">Cut-off: '+prog.cut+'</span></td>';
+    return '<td class="cmp-f">✗ Below<br><span style="font-size:10px;font-weight:400;color:#4e6285">Cut-off: '+prog.cut+'</span></td>';
+  }
+
+  html += '<div style="overflow-x:auto"><table class="cmp-table"><thead><tr><th>Program</th><th style="color:#00d4c8">'+(uniA.short||keyA)+'</th><th style="color:#f5a623">'+(uniB.short||keyB)+'</th></tr></thead><tbody>';
+  allNames.forEach(function(name){
+    html += '<tr><td class="cmp-prog-name">'+name+'</td>'+cell(mapA[name])+cell(mapB[name])+'</tr>';
+  });
+  html += '</tbody></table></div>';
+
+  document.getElementById('compare-results').innerHTML = html;
+}
+</script>
+
+</body>
+</html>
